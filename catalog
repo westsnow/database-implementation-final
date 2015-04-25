@@ -1,39 +1,4 @@
 BEGIN
-nation
-nation.tbl
-n_nationkey Int
-n_name String
-n_regionkey Int
-n_comment String
-END
-
-BEGIN
-part
-part.tbl
-p_partkey Int
-p_name String
-p_mfgr String
-p_brand String
-p_type String
-p_size Int
-p_container String
-p_retailprice Double
-p_comment String
-END
-
-BEGIN
-supplier
-supplier.tbl
-s_suppkey Int
-s_name String
-s_address String
-s_nationkey Int
-s_phone String
-s_acctbal Double
-s_comment String
-END
-
-BEGIN
 partsupp
 partsupp.tbl
 ps_partkey Int
@@ -91,3 +56,20 @@ l_shipmode String
 l_comment String
 END
 
+
+BEGIN
+facts
+facts.tbl
+entity String
+relation String
+value String
+END
+
+BEGIN
+nation2
+nation2.tbl
+n_nationkey Int
+n_name String
+n_regionkey Int
+n_comment String
+END

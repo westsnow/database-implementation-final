@@ -95,14 +95,15 @@ void ExecutionEngine::createTable(){
 void ExecutionEngine::insertInto(){
 	
 
-
+	char rpath[100];
+	Schema *sh;
 	if( existance(oldtable) ){
 		DBFile dbfile;
-		char rpath[100];
+		
 		sprintf (rpath, "%s%s.bin", dbfile_dir, oldtable);
 		
 		if(dbfile.Open(rpath)){
-			Schema *sh = new Schema(catalog_path, oldtable);
+			sh = new Schema(catalog_path, oldtable);
 			//sh->Print();
 			dbfile.Load (*(sh), newfile);
 			dbfile.Close ();
@@ -116,6 +117,23 @@ void ExecutionEngine::insertInto(){
 	else{
 		cout<<"ERROR!!!! THIS TABLE DOES NOT EXISTS"<<endl;
 	}
+
+	DBFile dbfile;
+	dbfile.Open (rpath);
+	dbfile.MoveFirst();
+
+	Record temp;
+
+	int counter = 0;
+	while (dbfile.GetNext (temp) == 1) {
+		counter += 1;
+		temp.Print (sh);
+		if (counter % 10000 == 0) {
+			cout << counter << "\n";
+		}
+	}
+	cout << " scanned " << counter << " recs \n";
+	dbfile.Close ();
 	
 }
 

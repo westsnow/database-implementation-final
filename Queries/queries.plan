@@ -85,5 +85,18 @@ CREATE TABLE facts (entity STRING, relation STRING, value STRING) AS HEAP
 
 INSERT 'facts.tbl' INTO facts
 
-SELECT f.entity, f.value FROM facts AS f WHERE (f.relation = 'CANADA')
+SELECT f.entity, f.value FROM facts AS f WHERE (f.relation = 'aaa' OR f.relation = 'bbb' OR f.relation = 'ccc')
+
+DROP TABLE facts
+
+
+
+
+CREATE TABLE nation2 (n_nationkey INTEGER, n_name STRING, n_regionkey INTEGER, n_comment STRING) AS HEAP
+
+INSERT '/cise/homes/mer/DBIDATA/input/nation.tbl' INTO nation2
+
+SELECT n.n_nationkey 
+FROM nation2 AS n 
+WHERE (n.n_nationkey > 2)
 
