@@ -146,7 +146,6 @@ void* WriteOutWorkerThread(void *arg){
 		}
 		fprintf(wos->file, "\n");
 	}
-	fclose(wos->file);
 }
 
 void WriteOut::Run (Pipe &inPipe, FILE *outFile, Schema &mySchema){

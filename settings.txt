@@ -1,4 +1,4 @@
 catalog
-/cise/homes/mer/DBIDATA/output/
-/cise/homes/mer/DBIDATA/input/
+/cise/homes/shuai/DBIDATA/output/
+/cise/homes/shuai/DBIDATA/input/
 Statistics.txt

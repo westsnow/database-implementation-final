@@ -105,7 +105,7 @@ Optimizer::Optimizer(Statistics *st){
 	s = new Statistics( *(st) );
 	// s->init();
 	planRoot = NULL;	
-
+	output = NULL;
 }
 void Optimizer::executeQuery(){
 	int numNodes = planRoot->outPipeID;
@@ -114,6 +114,10 @@ void Optimizer::executeQuery(){
     planRoot->execute(pipes, relops);
     for (int i=1; i<=numNodes; ++i)
       relops[i] -> WaitUntilDone();
+
+
+  	if(output != stdout)
+  		fclose(output);
 }
 
 void Optimizer::planQuery(){
@@ -124,12 +128,28 @@ void Optimizer::planQuery(){
 	// // PrintOperand(finalFunction->code);
 
 
+	//read readMode from outputMode.txt
+	ifstream f;
+	f.open("outputMode.txt");
+	string outMode;
+	f>>outMode;
+	cout<<"the outMode is "<<outMode<<endl;
+	f.close();
+
+	if(outMode == "STDOUT")
+		output = stdout;
+	else if(outMode != "NONE"){
+		output = fopen ((char*)outMode.c_str(), "w");
+	}else{
+		output = NULL;
+	}
+
 	createTableNodes();
 	createJoinNodes();
 	createSumNodes();
 	createProjectNodes();
 	createDistinctNodes();
-	createWriteOutNodes("stdout");
+	createWriteOutNodes(output);
 	// cout<<"before printing"<<endl;
 	// cout<<distinctAtts<<endl;
 	// cout<<distinctFunc<<endl;
@@ -146,6 +166,9 @@ void Optimizer::planQuery(){
 	// cout<<"after printing"<<endl;
 
 	traverse(planRoot);
+
+	if(output != NULL)
+		executeQuery();
 }
 
 //Work left to do!!!!!!! 
@@ -234,8 +257,8 @@ void Optimizer::createJoinNodes(){
 	}
 }
 
-void Optimizer::createWriteOutNodes(string fileName) {
-	planRoot = new WriteOutNode(planRoot, pipeid, fileName);
+void Optimizer::createWriteOutNodes(FILE* output) {
+	planRoot = new WriteOutNode(planRoot, pipeid, output);
 }
 
 void Optimizer::createDistinctNodes() {
@@ -361,11 +384,11 @@ SumNode::SumNode(struct FuncOperator* parseTree, QueryPlanNode* root, int outPip
   	outSchema = new Schema ("", 1, atts[computeMe.resultType()]);
 }
 
-WriteOutNode::WriteOutNode(QueryPlanNode* root, int outPipeID, string fileName){
+WriteOutNode::WriteOutNode(QueryPlanNode* root, int outPipeID, FILE* output){
 	this->outPipeID = outPipeID;
 	children.push_back(root);
 	outSchema = new Schema(*(root->outSchema));
-	outFileName = fileName;
+	this->output = output;
 }
 
 GroupByNode::GroupByNode(struct NameList* nameList, struct FuncOperator* parseTree, QueryPlanNode* root, int outPipeID){
@@ -760,9 +783,12 @@ void GroupByNode::execute(Pipe** pipes, RelationalOp** relops){
 void WriteOutNode::execute(Pipe** pipes, RelationalOp** relops){
 	cout<<"exe...writeout"<<endl;
 	children[0]->execute(pipes, relops);
+	if(output == NULL){
+		cout<<"--------------------------OUTPUT IS SET TO NULL--------------------------"<<endl;
+		return;
+	}
 	WriteOut * wo = new WriteOut();
 	relops[outPipeID] = wo;	
-	FILE *writefile = fopen ((char*)outFileName.c_str(), "w");
-	wo->Run(*(pipes[children[0]->outPipeID]), writefile, *outSchema);
+	wo->Run(*(pipes[children[0]->outPipeID]), output, *outSchema);
 }
 

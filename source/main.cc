@@ -50,14 +50,16 @@ int main()
 	run = true;
 	char *settings_path = "settings.txt";
 	settings(settings_path);
+
+
 	Statistics *s = new Statistics();
-	//s->init();
 	s->Read(statistics_dir);
-	ExecutionEngine *engine = new ExecutionEngine(s);
-	Optimizer *optimizer = new Optimizer(s);
+
 	cout<<"Write your SQL query, to execute press enter ant then ctrl + D"<<endl;
 	while(run){
 		
+		ExecutionEngine *engine = new ExecutionEngine(s);
+
 		cout<<"\nsql>> ";
 		yyparse();
 		
@@ -65,9 +67,9 @@ int main()
 		//engine->select();
 		//optimizer->planQuery();
 		
-		//if(bye){
+		if(bye){
 			run = false;
-		//}
+		}
 
 	}
 	//s->clearStats();

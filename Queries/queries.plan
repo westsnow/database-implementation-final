@@ -94,7 +94,7 @@ DROP TABLE facts
 
 CREATE TABLE nation2 (n_nationkey INTEGER, n_name STRING, n_regionkey INTEGER, n_comment STRING) AS HEAP
 
-INSERT '/cise/homes/mer/DBIDATA/input/nation.tbl' INTO nation2
+INSERT '/cise/homes/shuai/DBIDATA/input/nation.tbl' INTO nation2
 
 SELECT n.n_nationkey 
 FROM nation2 AS n 

@@ -41,7 +41,7 @@ void ExecutionEngine::execute(){
     } else if (attsToSelect || finalFunction) {
       select();
     } 
-    //clear();
+    clear();
 }
 
 bool ExecutionEngine::existance(char *tableName){
@@ -152,9 +152,11 @@ void ExecutionEngine::dropTable(){
 
 		string line;
 		string newLine = "";
-		bool found = true;
+		bool found = false;
 		while(getline(catalog, line)){
-			if (trim(line).empty()) continue;
+			if (trim(line).compare(table) == 0){
+
+			}
 		    if (line == oldtable)  found = true;
 		    newLine += trim(line) + '\n';
 		    if (line == "END") {
@@ -169,37 +171,45 @@ void ExecutionEngine::dropTable(){
 
 
 		//Delete DBFiles
-
-		remove ((table+".bin").c_str());
-    	remove ((table+".bin.header").c_str());
+		string path(dbfile_dir);
+		remove ((path+table+".bin").c_str());
+    	remove ((path+table+".bin.header").c_str());
 
 	}
 }
 
 void ExecutionEngine::setOutput(char *mode){
-	cout<<" setOutput";
+	// FILE* file = stdout;
+	// fprintf(file, "%s", mode);
+	// fprintf(file, "\n");
+
+	ofstream f;
+	f.open("outputMode.txt");
+	f<<mode;
+	f<<endl;
+	f.close();
+	// fclose(file);
+	// cout<<"hi"<<endl;
 }
 
 void ExecutionEngine::select(){
 
 	Optimizer *optimizer = new Optimizer(s);
 	optimizer->planQuery();
-  optimizer->executeQuery();
-
 }
  void ExecutionEngine::clear(){
  	
- 	newtable = "";
-	newfile = "";
-	oldtable = "";
-	deoutput = "";
-	NameList *attsToSelect = NULL;
-	FuncOperator *finalFunction = NULL; 
-	TableList* tables = NULL;
-	AndList* boolean = NULL;
-	NameList* groupingAtts = NULL;
-	distinctAtts = NULL;
-	distinctFunc = NULL;
+ 	newtable = NULL;
+	newfile = NULL;
+	oldtable = NULL;
+	deoutput = NULL;
+	attsToSelect = NULL;
+	finalFunction = NULL; 
+	tables = NULL;
+	boolean = NULL;
+	groupingAtts = NULL;
+	distinctAtts = 0;
+	distinctFunc = 0;
 	
  }
 

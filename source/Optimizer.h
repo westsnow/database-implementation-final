@@ -8,6 +8,7 @@
 #include <math.h>
 #include <algorithm>
 #include <climits>
+#include <iostream>
 
 
 #include "Comparison.h"
@@ -28,6 +29,7 @@ class Optimizer{
 
 	public:
 
+		FILE* output;
 		Optimizer(Statistics *st);
 		~Optimizer();
 
@@ -39,7 +41,7 @@ class Optimizer{
 		void createSumNodes();	
 		void createProjectNodes();	
 		void createDistinctNodes();
-		void createWriteOutNodes(string fileName);
+		void createWriteOutNodes(FILE* f);
 };
 
 
@@ -133,9 +135,10 @@ class GroupByNode : public QueryPlanNode {
 class WriteOutNode : public QueryPlanNode {
 	public:
 		int inPipe;
-		string outFileName;
 
-		WriteOutNode(QueryPlanNode* root, int outPipeID, string fileName);
+		FILE* output;
+
+		WriteOutNode(QueryPlanNode* root, int outPipeID, FILE* output);
 		void execute(Pipe** pipes, RelationalOp** relops) ;
 
 		void toString();
