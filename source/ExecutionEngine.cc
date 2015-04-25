@@ -120,7 +120,42 @@ void ExecutionEngine::insertInto(){
 }
 
 void ExecutionEngine::dropTable(){
-	cout<<"Drop Table";
+	if(existance(oldtable)){
+		string table(oldtable);
+		//Delete from statistics
+		s->deleteTable(oldtable);
+
+		// Delete from schema
+		ifstream catalog;
+		catalog.open(catalog_path);
+
+		ofstream tmpFile;
+		tmpFile.open("tmpFile.tmp");
+
+		string line;
+		string newLine = "";
+		bool found = true;
+		while(getline(catalog, line)){
+			if (trim(line).empty()) continue;
+		    if (line == oldtable)  found = true;
+		    newLine += trim(line) + '\n';
+		    if (line == "END") {
+		      if (!found) tmpFile << newLine << endl;
+		      found = false;
+		      newLine.clear();
+		    }			
+		}
+		tmpFile.close();
+		catalog.close();
+		rename ("tmpFile.tmp", catalog_path);
+
+
+		//Delete DBFiles
+
+		remove ((table+".bin").c_str());
+    	remove ((table+".bin.header").c_str());
+
+	}
 }
 
 void ExecutionEngine::setOutput(char *mode){

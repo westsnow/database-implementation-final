@@ -63,7 +63,8 @@ public:
 	void init();
 	string getTableNameFromAttr(string attrName);
 	void clearStats();
-
+	void deleteTable(char *oldTableName);
+	
 private:
 	
 

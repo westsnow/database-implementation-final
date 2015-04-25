@@ -455,6 +455,11 @@ void Statistics::clearStats(){
 
 }
 
+void Statistics::deleteTable(char *oldTableName){
+	string key(oldTableName);
+	relInfo.erase(key);
+}
+
 void Statistics::init(){
 
 
