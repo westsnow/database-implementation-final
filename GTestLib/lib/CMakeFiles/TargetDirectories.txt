@@ -1,0 +1,2 @@
+/Users/westsnow/Documents/gtest-1.7.0/lib/CMakeFiles/gtest.dir
+/Users/westsnow/Documents/gtest-1.7.0/lib/CMakeFiles/gtest_main.dir
