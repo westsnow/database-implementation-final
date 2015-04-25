@@ -58,6 +58,12 @@ WHERE (s.s_suppkey = ps.ps_suppkey) AND
 	  (p.p_mfgr = 'Manufacturer#4') AND
 	  (ps.ps_supplycost < 350)
 
+SELECT  s.s_name
+FROM supplier AS s, part AS p, partsupp AS ps
+WHERE (s.s_suppkey = ps.ps_suppkey) AND
+	  (p.p_partkey = ps.ps_partkey) AND
+	  (p.p_mfgr = 'Manufacturer#4') AND
+	  (ps.ps_supplycost < 350)
 
 ANSWER: 9964 rows (1.51 sec)
 ===========================================================

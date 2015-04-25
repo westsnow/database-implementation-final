@@ -10,7 +10,7 @@ SELECT s.s_suppkey, ps.ps_partkey
 FROM partsupp AS ps, part AS p, supplier AS s
 WHERE (p.p_partkey = ps.ps_partkey) AND (s.s_suppkey = ps.ps_suppkey)
 
-SELECT s.s_suppkey 
+SELECT DISTINCT s.s_suppkey 
 FROM partsupp AS ps, supplier AS s
 WHERE (s.s_suppkey = ps.ps_suppkey)
 	
