@@ -5,85 +5,6 @@
 
 int const PIPE_SIZE = 100;
 
-void PrintOperand(struct Operand *pOperand)
-{
-        if(pOperand!=NULL)
-        {
-                cout<<pOperand->value<<" ";
-                cout<<" ("<<pOperand->code<<") ";
-        }
-        else
-                return;
-}
-
-void PrintComparisonOp(struct ComparisonOp *pCom)
-{
-        if(pCom!=NULL)
-        {
-                PrintOperand(pCom->left);
-                switch(pCom->code)
-                {
-                        case 1:
-                                cout<<" < "; break;
-                        case 2:
-                                cout<<" > "; break;
-                        case 3:
-                                cout<<" = ";
-                }
-                PrintOperand(pCom->right);
-
-        }
-        else
-        {
-                return;
-        }
-}
-void PrintOrList(struct OrList *pOr)
-{
-        if(pOr !=NULL)
-        {
-                struct ComparisonOp *pCom = pOr->left;
-                PrintComparisonOp(pCom);
-
-                if(pOr->rightOr)
-                {
-                        cout<<" OR ";
-                        PrintOrList(pOr->rightOr);
-                }
-        }
-        else
-        {
-                return;
-        }
-}
-void PrintAndList(struct AndList *pAnd)
-{
-        if(pAnd !=NULL)
-        {
-                struct OrList *pOr = pAnd->left;
-                PrintOrList(pOr);
-                if(pAnd->rightAnd)
-                {
-                        cout<<" AND ";
-                        PrintAndList(pAnd->rightAnd);
-                }
-        }
-        else
-        {
-                return;
-        }
-}
-void PrintNameList(struct  NameList* list){
-	if(list == NULL){
-		cout<<"print done"<<endl;
-	}else{
-		cout<<list->name<<endl;
-		list = list->next;
-		PrintNameList(list);
-	}
-}
-
-
 // from parser
 extern FuncOperator* finalFunction;
 extern TableList* tables;
@@ -97,16 +18,37 @@ extern char* dbfile_dir;
 extern char *catalog_path;
 
 
-int pipeid = 1;
 using namespace std;
 
 Optimizer::Optimizer(Statistics *st){
+	cout<<"pipe id is reset~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<endl;
+	pipeid = 1;
 
 	s = new Statistics( *(st) );
 	// s->init();
 	planRoot = NULL;	
 	output = NULL;
 }
+
+Optimizer::~Optimizer(){
+	cout<<"clear nodes........."<<endl;
+	// clearTableNodes();
+	clearNodes();
+		tableNodes.clear();
+
+}
+
+void Optimizer::clearNodes(){
+	delete planRoot;
+}
+
+void Optimizer::clearTableNodes(){
+	for(int i = 0; i < tableNodes.size(); ++i){
+		cout<<"db file closing~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<endl;
+		tableNodes[i]->dbFile.Close();
+	}
+}
+
 void Optimizer::executeQuery(){
 	int numNodes = planRoot->outPipeID;
     Pipe** pipes = new Pipe*[numNodes+5];
@@ -115,6 +57,13 @@ void Optimizer::executeQuery(){
     for (int i=1; i<=numNodes; ++i)
       relops[i] -> WaitUntilDone();
 
+  	clearTableNodes();
+  	for(int i = 1; i <= numNodes; ++i){
+  		delete relops[i];
+  		delete pipes[i];
+  	}
+  	delete[] pipes;
+  	delete[] relops;
 
   	if(output != stdout)
   		fclose(output);
@@ -169,6 +118,8 @@ void Optimizer::planQuery(){
 
 	if(output != NULL)
 		executeQuery();
+
+	// clearNodes();
 }
 
 //Work left to do!!!!!!! 
@@ -725,7 +676,7 @@ void TableNode::execute(Pipe** pipes, RelationalOp** relops){
   SelectFile* sf = new SelectFile();
   pipes[outPipeID] = new Pipe(PIPE_SIZE);
   relops[outPipeID] = sf;
-  cout<<"the outPipeid is "<<outPipeID<<endl;
+
   sf->Run(dbFile, *(pipes[outPipeID]), cond, literal);
 }
 
@@ -792,3 +743,10 @@ void WriteOutNode::execute(Pipe** pipes, RelationalOp** relops){
 	wo->Run(*(pipes[children[0]->outPipeID]), output, *outSchema);
 }
 
+QueryPlanNode::~QueryPlanNode(){
+	cout<<"base deconstructor is called"<<endl;
+	for(int i = 0; i < children.size(); ++i){
+		delete children[i];
+	}
+	delete outSchema;
+}

@@ -1,0 +1,1 @@
+g++ -O2 -Wno-deprecated -std=c++0x -c -g source/Statistics.cc -o bin/Statistics.o

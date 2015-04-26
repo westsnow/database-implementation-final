@@ -16,6 +16,21 @@ Statistics::Statistics()
 Statistics::Statistics(Statistics &copyMe)
 {
 	relInfo = copyMe.relInfo;
+	// for (unordered_map<string, RelStat*>::iterator it1 = copyMe.relInfo.begin(); it1!=copyMe.relInfo.end(); ++it1){
+	// 	string str1 = it1->first;
+	// 	RelStat *relstat = new RelStat();
+	// 	relstat->numTuples = it1->second->numTuples;
+
+		
+	// 	for (unordered_map<string, int>::iterator it2 = it1->second->attInfo.begin(); it2!=it1->second->attInfo.end(); ++it2){
+	// 		string str2 = it2->first;
+	// 		int n = it2->second;
+	// 		relstat->attInfo[str2] = n ;
+	// 	}
+
+	// 	relInfo[str1] = relstat;
+	// 	relstat->attInfo.clear();
+	// }
 }
 Statistics::~Statistics()
 {

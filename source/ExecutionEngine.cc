@@ -28,7 +28,8 @@ const char* myTypes[3] = {"Int", "Double", "String"};
 ExecutionEngine::ExecutionEngine(Statistics *st){
 	s = st;
 }
-
+ExecutionEngine::~ExecutionEngine(){
+}
 void ExecutionEngine::execute(){
 	if (newtable) {
       createTable();
@@ -179,23 +180,17 @@ void ExecutionEngine::dropTable(){
 }
 
 void ExecutionEngine::setOutput(char *mode){
-	// FILE* file = stdout;
-	// fprintf(file, "%s", mode);
-	// fprintf(file, "\n");
-
 	ofstream f;
 	f.open("outputMode.txt");
 	f<<mode;
 	f<<endl;
 	f.close();
-	// fclose(file);
-	// cout<<"hi"<<endl;
 }
 
 void ExecutionEngine::select(){
-
-	Optimizer *optimizer = new Optimizer(s);
-	optimizer->planQuery();
+	Optimizer optimizer(s);
+	// Optimizer *optimizer = new Optimizer(s);
+	optimizer.planQuery();
 }
  void ExecutionEngine::clear(){
  	

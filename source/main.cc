@@ -58,12 +58,12 @@ int main()
 	cout<<"Write your SQL query, to execute press enter ant then ctrl + D"<<endl;
 	while(run){
 		
-		ExecutionEngine *engine = new ExecutionEngine(s);
-
+		// ExecutionEngine *engine = new ExecutionEngine(s);
+		ExecutionEngine engine(s);
 		cout<<"\nsql>> ";
 		yyparse();
 		
-		engine->execute();
+		engine.execute();
 		//engine->select();
 		//optimizer->planQuery();
 		

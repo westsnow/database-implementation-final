@@ -19,13 +19,17 @@
 
 using namespace std;
 
-class QueryPlanNode; class TableNode;
+class QueryPlanNode; 
+class TableNode;
 
 class Optimizer{
 	private:
+		int pipeid;
 		QueryPlanNode *planRoot;
 		Statistics *s;
 		vector<TableNode*> tableNodes;
+		void clearNodes();
+		void clearTableNodes();//close dbfile in table nodes.
 
 	public:
 
@@ -54,7 +58,7 @@ class QueryPlanNode{
 		int outPipeID;
   		virtual void execute(Pipe** pipes, RelationalOp** relops) = 0;
 		virtual void toString() = 0;
-
+		~QueryPlanNode();
 };
 
 //Leaf node select from file!
@@ -84,7 +88,7 @@ class ProjectNode : public QueryPlanNode {
 		void execute(Pipe** pipes, RelationalOp** relops);
 		int inPipeID;
 		ProjectNode(NameList* atts, QueryPlanNode* root, int pipeid);
-		void toString(); 
+		void toString();
 };
 
 
@@ -100,6 +104,7 @@ class JoinNode : public QueryPlanNode {
 		void relatedJoinCNF(AndList *boolean, Statistics *s);
 		JoinNode(int leftPipeID, int rightPipeID, int outPipeID);
 		void toString();
+
 };
 
 class DuplicateRemovalNode : public QueryPlanNode {
