@@ -28,7 +28,7 @@ using namespace std;
 Optimizer::Optimizer(Statistics *st){
 	cout<<"pipe id is reset~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<endl;
 	pipeid = 1;
-
+	used.clear();
 	s = new Statistics( *(st) );
 	// s->init();
 	planRoot = NULL;	
@@ -99,9 +99,10 @@ void Optimizer::planQuery(){
 	cout<<"the outMode is "<<outMode<<endl;
 	f.close();
 
-	if(outMode == "STDOUT")
+	if(outMode.compare("STDOUT") == 0){
 		output = stdout;
-	else if(outMode != "NONE"){
+	}else if(outMode.compare("NONE") != 0){
+		cout<<"HERE FILE";
 		output = fopen ((char*)outMode.c_str(), "w");
 	}else{
 		output = NULL;
@@ -111,7 +112,7 @@ void Optimizer::planQuery(){
 	createTableNodes();
 	createJoinNodes();
 
-	//createSelectNodes();
+	createSelectNodes();
 	
 	createSumNodes();
 	createProjectNodes();
@@ -133,7 +134,7 @@ void Optimizer::planQuery(){
 	// cout<<"after printing"<<endl;
 
 	traverse(planRoot);
-
+		
 	if(output != NULL)
 		executeQuery();
 
@@ -228,6 +229,29 @@ void Optimizer::createJoinNodes(){
 
 void Optimizer::createWriteOutNodes(FILE* output) {
 	planRoot = new WriteOutNode(planRoot, pipeid, output);
+}
+void Optimizer::createSelectNodes() {
+	
+
+	AndList *tmp = boolean;
+	AndList *others = NULL;
+
+	for(int i=0; i<used.size(); i++){
+		if(used[i] == false){
+			
+			AndList *node = new AndList();
+			node->rightAnd = others;	
+			node->left = tmp->left;
+			others = node;
+				
+		}
+		tmp = tmp->rightAnd;
+	}
+
+
+	if(others)
+		planRoot = new SelectNode(planRoot, pipeid++, others);
+		
 }
 
 void Optimizer::createDistinctNodes() {
@@ -333,6 +357,13 @@ ProjectNode::ProjectNode(NameList* atts, QueryPlanNode* root, int pipeid){
  	outSchema = new Schema ("", numAttsOut, resultAtts);
 }
 
+SelectNode::SelectNode(QueryPlanNode* root, int outPipeID, AndList *others){
+	children.push_back(root);
+	this->outPipeID = outPipeID;
+	outSchema = new Schema(*(root->outSchema));
+	cond.GrowFromParseTree (others, outSchema, literal);		
+}
+
 // void printParseTree(struct FuncOperator* parseTree){
 // 	if(parseTree == NULL){
 // 		return;
@@ -432,7 +463,7 @@ void TableNode::relatedSelectCNF(AndList *boolean, Statistics *s, vector<bool> &
 	while(andTmp != NULL){
 
 		OrList *orList = andTmp->left;
-
+		bool all = true;
 		while(orList != NULL){
 			struct ComparisonOp *pCom = orList->left;
 			struct Operand* leftOperand = pCom->left;
@@ -446,22 +477,30 @@ void TableNode::relatedSelectCNF(AndList *boolean, Statistics *s, vector<bool> &
 
 			if((leftOperand->code == NAME && rightOperand->code != NAME) || (leftOperand->code != NAME && rightOperand->code == NAME)){
 				if((tableNameOfLeft.compare(alias) == 0) || (tableNameOfRight.compare(alias) == 0)){
-					AndList *node = new AndList();
-					if(andFinal == NULL){
-						node->left = andTmp->left;
-						node->rightAnd = NULL;
 						
-					}
-					else{
-						node->rightAnd = andFinal;
-						node->left = andTmp->left;
-					}
-					andFinal = node;
-					used[idx] = true;
+					
+				}else{
+					all = false;
 					break;
 				}
-			}
+			}else{
+					all = false;
+					break;
+				}
 			orList = orList->rightOr;
+		}
+		if(all){
+			AndList *node = new AndList();
+			if(andFinal == NULL){
+				node->left = andTmp->left;
+				node->rightAnd = NULL;		
+			}
+			else{
+				node->rightAnd = andFinal;
+				node->left = andTmp->left;
+			}
+			andFinal = node;
+			used[idx] = true;
 		}
 		andTmp = andTmp->rightAnd;
 		idx += 1;
@@ -675,6 +714,19 @@ void TableNode::toString(){
 	cout<<"Output Schema:"<<endl;
 		outSchema->Print();
 }
+
+void SelectNode::toString(){
+
+	cout<<"***************************"<<endl;
+	cout<<"Select From Pipe Operation"<<endl;
+	cout<<"child Input: "<<children[0]->outPipeID<<endl;
+	cout<<"Output pipe Id: "<<outPipeID<<endl;
+	cout<<"Applied CNF: "<<endl;
+		cond.Print();
+	cout<<"Output Schema:"<<endl;
+		outSchema->Print();
+}
+
 void JoinNode::toString(){
 
 	cout<<"***************************"<<endl;
@@ -705,6 +757,14 @@ void TableNode::execute(Pipe** pipes, RelationalOp** relops){
 
   sf->Run(dbFile, *(pipes[outPipeID]), cond, literal);
   
+}
+
+void SelectNode::execute(Pipe** pipes, RelationalOp** relops){
+	SelectPipe* sp = new SelectPipe();
+	children[0] -> execute(pipes, relops);
+	pipes[outPipeID] = new Pipe(PIPE_SIZE);
+	relops[outPipeID] = sp;
+	sp -> Run( *(pipes[children[0]->outPipeID]), *(pipes[outPipeID]), cond, literal );
 }
 
 void ProjectNode::execute(Pipe** pipes, RelationalOp** relops){

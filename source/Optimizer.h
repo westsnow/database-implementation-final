@@ -47,6 +47,9 @@ class Optimizer{
 		void createProjectNodes();	
 		void createDistinctNodes();
 		void createWriteOutNodes(FILE* f);
+		void createSelectNodes();
+
+
 };
 
 
@@ -76,6 +79,19 @@ class TableNode : public QueryPlanNode {
 		void execute(Pipe** pipes, RelationalOp** relops);
 		void relatedSelectCNF(AndList *boolean, Statistics *s, vector<bool> &used);
 		TableNode(char *name, char *alias, int outPipeID);
+		void toString();
+};
+
+//Select from pipe
+class SelectNode : public QueryPlanNode { 
+	
+	public:
+		CNF cond;
+		Record literal;
+
+		void execute(Pipe** pipes, RelationalOp** relops);
+		//void relatedSelectCNF(AndList *boolean, Statistics *s, vector<bool> &used);
+		SelectNode(QueryPlanNode* root, int outPipeID, AndList *others);
 		void toString();
 };
 

@@ -137,20 +137,7 @@ void ExecutionEngine::dropTable(){
 		string line;
 		string newLine = "";
 		bool found = false;
-<<<<<<< Updated upstream
-		while(getline(catalog, line)){
-			if (trim(line).compare(table) == 0){
 
-			}
-		    if (line == oldtable)  found = true;
-		    newLine += trim(line) + '\n';
-		    if (line == "END") {
-		      if (!found) tmpFile << newLine << endl;
-		      found = false;
-		      newLine.clear();
-		    }			
-=======
-		
 		while(getline(catalog, line)){
 			if (trim(line).empty()){
 
@@ -164,7 +151,7 @@ void ExecutionEngine::dropTable(){
 			    }		
 			}
 		    		
->>>>>>> Stashed changes
+
 		}
 		
 		
@@ -190,17 +177,16 @@ void ExecutionEngine::setOutput(char *mode){
 }
 
 void ExecutionEngine::select(){
-<<<<<<< Updated upstream
+
 	Optimizer optimizer(s);
 	// Optimizer *optimizer = new Optimizer(s);
 	optimizer.planQuery();
-=======
 
-	Optimizer *optimizer = new Optimizer(s);
-	optimizer->planQuery();
-  	optimizer->executeQuery();
 
->>>>>>> Stashed changes
+	
+  	//optimizer.executeQuery();
+
+
 }
  void ExecutionEngine::clear(){
  	

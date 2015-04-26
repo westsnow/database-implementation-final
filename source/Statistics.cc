@@ -421,9 +421,9 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
 					break;
 				}else{
 					double f;
-					if(leftOperand->code == NAME)
+					if(leftOperand->code == NAME){
 						f = 1.0/relInfo[tableNameOfLeft]->getValue(leftValue) ;
-					else
+					}else
 						f = 1.0/relInfo[tableNameOfRight]->getValue(rightValue);
 					if(pCom->code != EQUALS)
 						f = (1.0/3);

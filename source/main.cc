@@ -54,14 +54,10 @@ int main()
 
 	Statistics *s = new Statistics();
 	s->Read(statistics_dir);
-<<<<<<< Updated upstream
 
-=======
-	
->>>>>>> Stashed changes
 	cout<<"Write your SQL query, to execute press enter ant then ctrl + D"<<endl;
 	while(run){
-		ExecutionEngine *engine = new ExecutionEngine(s);
+		
 		
 		// ExecutionEngine *engine = new ExecutionEngine(s);
 		ExecutionEngine engine(s);
