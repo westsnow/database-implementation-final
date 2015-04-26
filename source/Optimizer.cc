@@ -18,12 +18,11 @@ extern char* dbfile_dir;
 extern char *catalog_path;
 
 
-<<<<<<< Updated upstream
-=======
+
+
 int pipeid = 1;
 vector<bool> used;
 
->>>>>>> Stashed changes
 using namespace std;
 
 Optimizer::Optimizer(Statistics *st){
@@ -92,8 +91,6 @@ void Optimizer::planQuery(){
 	// cout<<distinctFunc<<endl;
 	// // PrintOperand(finalFunction->code);
 
-<<<<<<< Updated upstream
-
 	//read readMode from outputMode.txt
 	ifstream f;
 	f.open("outputMode.txt");
@@ -110,16 +107,12 @@ void Optimizer::planQuery(){
 		output = NULL;
 	}
 
-=======
 	initialize();
->>>>>>> Stashed changes
 	createTableNodes();
 	createJoinNodes();
 
-	for(int i=0; i<used.size(); i++){
-		cout << used[i] << endl;
-	}
-
+	//createSelectNodes();
+	
 	createSumNodes();
 	createProjectNodes();
 	createDistinctNodes();
