@@ -7,9 +7,12 @@ n_regionkey Int
 n_comment String
 END
 
+<<<<<<< Updated upstream
 
 
 
+=======
+>>>>>>> Stashed changes
 BEGIN
 part
 part.tbl
@@ -24,9 +27,12 @@ p_retailprice Double
 p_comment String
 END
 
+<<<<<<< Updated upstream
 
 
 
+=======
+>>>>>>> Stashed changes
 BEGIN
 supplier
 supplier.tbl
@@ -39,9 +45,12 @@ s_acctbal Double
 s_comment String
 END
 
+<<<<<<< Updated upstream
 
 
 
+=======
+>>>>>>> Stashed changes
 BEGIN
 partsupp
 partsupp.tbl
@@ -109,3 +118,13 @@ l_shipmode String
 l_comment String
 END
 
+<<<<<<< Updated upstream
+=======
+BEGIN
+facts
+facts.tbl
+entity String
+relation String
+value String
+END
+>>>>>>> Stashed changes

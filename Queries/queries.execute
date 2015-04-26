@@ -20,10 +20,14 @@ ANSWER: 1.33123e+08 (17.31 sec)
 ============================================================
 
 (q3)
-SELECT l.l_orderkey, l.l_partkey, l.l_suppkey
+SELECT DISTINCT l.l_orderkey, l.l_partkey, l.l_suppkey
 FROM lineitem AS l
 WHERE (l.l_returnflag = 'R') AND 
+<<<<<<< Updated upstream
 	  (l.l_discount < 0.04) OR (l.l_shipmode = 'MAIL') AND
+=======
+	  (l.l_discount < 0.04 OR l.l_shipmode = 'MAIL') AND
+>>>>>>> Stashed changes
 	  (l.l_orderkey > 5000) AND (l.l_orderkey < 6000)
 
 ANSWER: 109 rows in set (17.47 sec)

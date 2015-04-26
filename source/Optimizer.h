@@ -37,6 +37,7 @@ class Optimizer{
 		Optimizer(Statistics *st);
 		~Optimizer();
 
+		void initialize();
 		void traverse(QueryPlanNode *root);
 		void planQuery();
 		void executeQuery();
@@ -73,7 +74,7 @@ class TableNode : public QueryPlanNode {
 		DBFile dbFile;
 
 		void execute(Pipe** pipes, RelationalOp** relops);
-		void relatedSelectCNF(AndList *boolean, Statistics *s);
+		void relatedSelectCNF(AndList *boolean, Statistics *s, vector<bool> &used);
 		TableNode(char *name, char *alias, int outPipeID);
 		void toString();
 };
@@ -101,7 +102,7 @@ class JoinNode : public QueryPlanNode {
 		
 		void execute(Pipe** pipes, RelationalOp** relops);
 
-		void relatedJoinCNF(AndList *boolean, Statistics *s);
+		void relatedJoinCNF(AndList *boolean, Statistics *s, vector<bool> &used);
 		JoinNode(int leftPipeID, int rightPipeID, int outPipeID);
 		void toString();
 

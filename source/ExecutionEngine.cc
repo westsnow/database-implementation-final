@@ -118,23 +118,6 @@ void ExecutionEngine::insertInto(){
 	else{
 		cout<<"ERROR!!!! THIS TABLE DOES NOT EXISTS"<<endl;
 	}
-
-	DBFile dbfile;
-	dbfile.Open (rpath);
-	dbfile.MoveFirst();
-
-	Record temp;
-
-	int counter = 0;
-	while (dbfile.GetNext (temp) == 1) {
-		counter += 1;
-		temp.Print (sh);
-		if (counter % 10000 == 0) {
-			cout << counter << "\n";
-		}
-	}
-	cout << " scanned " << counter << " recs \n";
-	dbfile.Close ();
 	
 }
 
@@ -154,6 +137,7 @@ void ExecutionEngine::dropTable(){
 		string line;
 		string newLine = "";
 		bool found = false;
+<<<<<<< Updated upstream
 		while(getline(catalog, line)){
 			if (trim(line).compare(table) == 0){
 
@@ -165,11 +149,29 @@ void ExecutionEngine::dropTable(){
 		      found = false;
 		      newLine.clear();
 		    }			
+=======
+		
+		while(getline(catalog, line)){
+			if (trim(line).empty()){
+
+			}else{
+				if (line.compare(table) == 0)  found = true;
+			    newLine += trim(line) + '\n';
+			    if (line == "END") {
+			      if (!found) tmpFile << newLine << endl;
+			      found = false;
+			      newLine.clear();
+			    }		
+			}
+		    		
+>>>>>>> Stashed changes
 		}
-		tmpFile.close();
-		catalog.close();
+		
+		
 		rename ("tmpFile.tmp", catalog_path);
 
+		tmpFile.close();
+		catalog.close();
 
 		//Delete DBFiles
 		string path(dbfile_dir);
@@ -188,9 +190,17 @@ void ExecutionEngine::setOutput(char *mode){
 }
 
 void ExecutionEngine::select(){
+<<<<<<< Updated upstream
 	Optimizer optimizer(s);
 	// Optimizer *optimizer = new Optimizer(s);
 	optimizer.planQuery();
+=======
+
+	Optimizer *optimizer = new Optimizer(s);
+	optimizer->planQuery();
+  	optimizer->executeQuery();
+
+>>>>>>> Stashed changes
 }
  void ExecutionEngine::clear(){
  	

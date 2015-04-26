@@ -18,6 +18,12 @@ extern char* dbfile_dir;
 extern char *catalog_path;
 
 
+<<<<<<< Updated upstream
+=======
+int pipeid = 1;
+vector<bool> used;
+
+>>>>>>> Stashed changes
 using namespace std;
 
 Optimizer::Optimizer(Statistics *st){
@@ -69,6 +75,16 @@ void Optimizer::executeQuery(){
   		fclose(output);
 }
 
+void Optimizer::initialize(){
+
+	AndList *tmp = boolean;
+	while(tmp != NULL){
+		used.push_back(false);
+		tmp = tmp->rightAnd;
+	}
+
+}
+
 void Optimizer::planQuery(){
 	
 	// // PrintAndList(boolean);
@@ -76,6 +92,7 @@ void Optimizer::planQuery(){
 	// cout<<distinctFunc<<endl;
 	// // PrintOperand(finalFunction->code);
 
+<<<<<<< Updated upstream
 
 	//read readMode from outputMode.txt
 	ifstream f;
@@ -93,8 +110,16 @@ void Optimizer::planQuery(){
 		output = NULL;
 	}
 
+=======
+	initialize();
+>>>>>>> Stashed changes
 	createTableNodes();
 	createJoinNodes();
+
+	for(int i=0; i<used.size(); i++){
+		cout << used[i] << endl;
+	}
+
 	createSumNodes();
 	createProjectNodes();
 	createDistinctNodes();
@@ -124,7 +149,7 @@ void Optimizer::planQuery(){
 
 //Work left to do!!!!!!! 
 double evalOrder(vector<TableNode*> tableNodes, Statistics *s, int minCost){
-	
+	vector<bool> used_cpy (used);
 	Statistics *temp_st = new Statistics(*(s));
 		int pipe = tableNodes.size();
 		if(tableNodes.size()>1){
@@ -135,7 +160,7 @@ double evalOrder(vector<TableNode*> tableNodes, Statistics *s, int minCost){
 			pipe += 1;
 			prev->children.push_back(left);
 			prev->children.push_back(right);
-			prev->relatedJoinCNF(boolean, temp_st);
+			prev->relatedJoinCNF(boolean, temp_st, used_cpy);
 			//join->toString();
 			//join->children[0]->toString();
 			//join->children[1]->toString();
@@ -145,7 +170,7 @@ double evalOrder(vector<TableNode*> tableNodes, Statistics *s, int minCost){
 				join->children.push_back(prev);
 				join->children.push_back(right);
 				//RelatedJoinCNF uses children! set them before use, I dont check that
-				join->relatedJoinCNF(boolean, temp_st);	
+				join->relatedJoinCNF(boolean, temp_st, used_cpy);	
 				pipe += 1;
 				prev = join;
 			}
@@ -185,7 +210,7 @@ void Optimizer::createJoinNodes(){
 		pipeid += 1;
 		prev->children.push_back(left);
 		prev->children.push_back(right);
-		prev->relatedJoinCNF(boolean, s);
+		prev->relatedJoinCNF(boolean, s, used);
 		//join->toString();
 		//join->children[0]->toString();
 		//join->children[1]->toString();
@@ -195,7 +220,7 @@ void Optimizer::createJoinNodes(){
 			join->children.push_back(prev);
 			join->children.push_back(right);
 			//RelatedJoinCNF uses children! set them before use, I dont check that
-			join->relatedJoinCNF(boolean, s);	
+			join->relatedJoinCNF(boolean, s, used);	
 			pipeid += 1;
 			prev = join;
 		}
@@ -233,7 +258,7 @@ void Optimizer::createTableNodes(){
 
 		TableNode *t = new TableNode(tmp->tableName, tmp->aliasAs, pipeid);
 		
-		t->relatedSelectCNF(boolean, s);
+		t->relatedSelectCNF(boolean, s, used);
 		//t->toString();
 		
 		tableNodes.push_back(t);
@@ -403,12 +428,13 @@ TableNode::TableNode(char *name, char *alias, int outPipeID){
 	fileName = "";
 }
 
-void TableNode::relatedSelectCNF(AndList *boolean, Statistics *s){
+void TableNode::relatedSelectCNF(AndList *boolean, Statistics *s, vector<bool> &used){
 	string name(tableName);
 	string alias(tableAlias);
 	AndList *andTmp = boolean;
 	AndList *andFinal = NULL;
 	
+	int idx = 0;
 
 	while(andTmp != NULL){
 
@@ -438,12 +464,14 @@ void TableNode::relatedSelectCNF(AndList *boolean, Statistics *s){
 						node->left = andTmp->left;
 					}
 					andFinal = node;
+					used[idx] = true;
 					break;
 				}
 			}
 			orList = orList->rightOr;
 		}
 		andTmp = andTmp->rightAnd;
+		idx += 1;
 	}
 
 	outSchema = new Schema(catalog_path, tableName, tableAlias);
@@ -499,12 +527,15 @@ JoinNode::JoinNode(int leftPipeID, int rightPipeID, int outPipeID){
 	this->outPipeID = outPipeID;
 }
 
-void JoinNode::relatedJoinCNF(AndList *boolean, Statistics *s){
+void JoinNode::relatedJoinCNF(AndList *boolean, Statistics *s, vector<bool> &used){
 	Schema *leftSchema = children[0]->outSchema;
 	Schema *rightSchema = children[1]->outSchema;
 
 	AndList *andTmp = boolean;
 	AndList *andFinal = NULL;
+
+	int idx = 0;
+
 	while(andTmp != NULL){
 
 		OrList *orList = andTmp->left;
@@ -533,12 +564,14 @@ void JoinNode::relatedJoinCNF(AndList *boolean, Statistics *s){
 						node->left = andTmp->left;
 					}
 					andFinal = node;
+					used[idx] = true;
 					break;
 				}
 			}
 			orList = orList->rightOr;
 		}
 		andTmp = andTmp->rightAnd;
+		idx += 1;
 	}
 
 	//Merge Left and Right Schemas!
@@ -678,6 +711,7 @@ void TableNode::execute(Pipe** pipes, RelationalOp** relops){
   relops[outPipeID] = sf;
 
   sf->Run(dbFile, *(pipes[outPipeID]), cond, literal);
+  
 }
 
 void ProjectNode::execute(Pipe** pipes, RelationalOp** relops){
