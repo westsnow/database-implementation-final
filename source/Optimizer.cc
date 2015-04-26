@@ -20,7 +20,6 @@ extern char *catalog_path;
 
 
 
-int pipeid = 1;
 vector<bool> used;
 
 using namespace std;
@@ -59,16 +58,17 @@ void Optimizer::executeQuery(){
     Pipe** pipes = new Pipe*[numNodes+5];
     RelationalOp** relops = new RelationalOp*[numNodes+5];
     planRoot->execute(pipes, relops);
-    for (int i=1; i<=numNodes; ++i)
+    for (int i=1; i<numNodes; ++i)
       relops[i] -> WaitUntilDone();
 
   	clearTableNodes();
-  	for(int i = 1; i <= numNodes; ++i){
-  		delete relops[i];
-  		delete pipes[i];
-  	}
-  	delete[] pipes;
-  	delete[] relops;
+  	// for(int i = 1; i < numNodes; ++i){
+  	// 	printf("delete pipe %d\n", i);
+  	// 	delete relops[i];
+  	// 	delete pipes[i];
+  	// }
+  	// delete[] pipes;
+  	// delete[] relops;
 
   	if(output != stdout)
   		fclose(output);

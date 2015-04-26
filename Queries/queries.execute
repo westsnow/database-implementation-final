@@ -56,7 +56,7 @@ FROM supplier AS s, part AS p, partsupp AS ps
 WHERE (s.s_suppkey = ps.ps_suppkey) AND
 	  (p.p_partkey = ps.ps_partkey) AND
 	  (p.p_mfgr = 'Manufacturer#4') AND
-	  (ps.ps_supplycost < 350)
+	  (ps.ps_supplycost < 350.0)
 
 SELECT  s.s_name
 FROM supplier AS s, part AS p, partsupp AS ps
